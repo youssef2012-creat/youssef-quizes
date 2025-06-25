@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizMaster - Interactive Quiz Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+            min-height: 600px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+            min-width: 150px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .input-group {
+            margin: 1.5rem 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .input-group input, .input-group textarea, .input-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group textarea:focus, .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .room-code {
+            background: #f8f9fa;
+            border: 2px dashed #667eea;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .room-code h3 {
+            color: #667eea;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .room-code .code {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+            letter-spacing: 3px;
+        }
+
+        .question-form {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+        }
+
+        .options-container {
+            margin: 1rem 0;
+        }
+
+        .option-input {
+            display: flex;
+            align-items: center;
+            margin: 0.5rem 0;
+            gap: 1rem;
+        }
+
+        .option-input input[type="text"] {
+            flex: 1;
+        }
+
+        .option-input input[type="radio"] {
+            transform: scale(1.5);
+        }
+
+        .questions-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 1rem 0;
+        }
+
+        .question-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 0.5rem 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .question-item h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .question-item ul {
+            list-style: none;
+            padding-left: 1rem;
+        }
+
+        .question-item li {
+            margin: 0.25rem 0;
+            color: #666;
+        }
+
+        .question-item .correct {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .participants-list {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+
+        .participant {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .quiz-question {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .quiz-question h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .quiz-option {
+            background: white;
+            border: 2px solid #e9ecef;
+            padding: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .quiz-option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .quiz-option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            height: 10px;
+            border-radius: 5px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .results-container {
+            margin: 1rem 0;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .score {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status.host {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .status.participant {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-2 {
+            margin-top: 1rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                margin: 1rem;
+            }
+
+            .content {
+                padding: 1rem;
+            }
+
+            .header {
+                padding: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .btn {
+                min-width: 120px;
+                padding: 0.8rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 QuizMaster</h1>
+            <p>Create, Join, and Play Interactive Quizzes</p>
+        </div>
+
+        <!-- Welcome Screen -->
+        <div class="screen active" id="welcome-screen">
+            <div class="content text-center">
+                <h2>Welcome to QuizMaster!</h2>
+                <p class="mb-2">Create a quiz room or join an existing one to get started.</p>
+                <button class="btn" onclick="showScreen('create-room-screen')">Create Room</button>
+                <button class="btn btn-secondary" onclick="showScreen('join-room-screen')">Join Room</button>
+            </div>
+        </div>
+
+        <!-- Create Room Screen -->
+        <div class="screen" id="create-room-screen">
+            <div class="content">
+                <h2>Create Quiz Room</h2>
+                <div class="input-group">
+                    <label for="host-name">Your Name:</label>
+                    <input type="text" id="host-name" placeholder="Enter your name">
+                </div>
+                <div class="input-group">
+                    <label for="room-title">Room Title:</label>
+                    <input type="text" id="room-title" placeholder="Enter quiz title">
+                </div>
+                <button class="btn" onclick="createRoom()">Create Room</button>
+                <button class="btn btn-secondary" onclick="showScreen('welcome-screen')">Back</button>
+            </div>
+        </div>
+
+        <!-- Join Room Screen -->
+        <div class="screen" id="join-room-screen">
+            <div class="content">
+                <h2>Join Quiz Room</h2>
+                <div class="input-group">
+                    <label for="participant-name">Your Name:</label>
+                    <input type="text" id="participant-name" placeholder="Enter your name">
+                </div>
+                <div class="input-group">
+                    <label for="room-code-input">Room Code:</label>
+                    <input type="text" id="room-code-input" placeholder="Enter room code" style="text-transform: uppercase;">
+                </div>
+                <button class="btn" onclick="joinRoom()">Join Room</button>
+                <button class="btn btn-secondary" onclick="showScreen('welcome-screen')">Back</button>
+            </div>
+        </div>
+
+        <!-- Host Dashboard -->
+        <div class="screen" id="host-dashboard">
+            <div class="content">
+                <div class="room-code">
+                    <h3>Room Code</h3>
+                    <div class="code" id="display-room-code"></div>
+                    <p>Share this code with participants</p>
+                </div>
+
+                <h3>Quiz Questions</h3>
+                <div class="questions-list" id="questions-list">
+                    <p>No questions added yet. Add your first question below!</p>
+                </div>
+
+                <div class="question-form">
+                    <h4>Add New Question</h4>
+                    <div class="input-group">
+                        <label for="question-text">Question:</label>
+                        <textarea id="question-text" rows="3" placeholder="Enter your question"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="question-type">Question Type:</label>
+                        <select id="question-type" onchange="updateQuestionForm()">
+                            <option value="multiple">Multiple Choice</option>
+                            <option value="truefalse">True/False</option>
+                        </select>
+                    </div>
+                    <div id="options-container" class="options-container">
+                        <label>Options (select the correct answer):</label>
+                        <div class="option-input">
+                            <input type="radio" name="correct-option" value="0">
+                            <input type="text" placeholder="Option 1" id="option-0">
+                        </div>
+                        <div class="option-input">
+                            <input type="radio" name="correct-option" value="1">
+                            <input type="text" placeholder="Option 2" id="option-1">
+                        </div>
+                        <div class="option-input">
+                            <input type="radio" name="correct-option" value="2">
+                            <input type="text" placeholder="Option 3" id="option-2">
+                        </div>
+                        <div class="option-input">
+                            <input type="radio" name="correct-option" value="3">
+                            <input type="text" placeholder="Option 4" id="option-3">
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="addQuestion()">Add Question</button>
+                </div>
+
+                <h3>Participants</h3>
+                <div class="participants-list" id="participants-list">
+                    <p>Waiting for participants to join...</p>
+                </div>
+
+                <div class="text-center mt-2">
+                    <button class="btn" onclick="startQuiz()" id="start-quiz-btn" disabled>Start Quiz</button>
+                    <button class="btn btn-secondary" onclick="leaveRoom()">Leave Room</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Participant Waiting Room -->
+        <div class="screen" id="participant-waiting">
+            <div class="content text-center">
+                <h2>Joined Quiz Room</h2>
+                <div class="room-code">
+                    <h3>Room Code</h3>
+                    <div class="code" id="participant-room-code"></div>
+                </div>
+                <h3>Participants</h3>
+                <div class="participants-list" id="waiting-participants-list">
+                    <p>Loading participants...</p>
+                </div>
+                <p>Waiting for the host to start the quiz...</p>
+                <button class="btn btn-secondary" onclick="leaveRoom()">Leave Room</button>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div class="screen" id="quiz-screen">
+            <div class="content">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="quiz-progress"></div>
+                </div>
+                <p>Question <span id="current-question-num">1</span> of <span id="total-questions">1</span></p>
+                
+                <div class="quiz-question">
+                    <h3 id="question-display">Question will appear here</h3>
+                    <div class="quiz-options" id="quiz-options">
+                        <!-- Options will be populated dynamically -->
+                    </div>
+                    <button class="btn" onclick="nextQuestion()" id="next-question-btn" disabled>Next Question</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="screen" id="results-screen">
+            <div class="content">
+                <h2 class="text-center">Quiz Results</h2>
+                <div class="results-container" id="results-container">
+                    <!-- Results will be populated dynamically -->
+                </div>
+                <div class="text-center mt-2">
+                    <button class="btn" onclick="showScreen('welcome-screen')">Create New Quiz</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUser = null;
+        let currentRoom = null;
+        let isHost = false;
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let participants = [];
+
+        // Simulate a simple storage system (in real app, this would be a backend)
+        let rooms = {};
+
+        // Utility functions
+        function generateRoomCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 6; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function showToast(message, type = 'info') {
+            // Simple toast notification
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'error' ? '#dc3545' : '#28a745'};
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 10px;
+                z-index: 1000;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Room Management
+        function createRoom() {
+            const hostName = document.getElementById('host-name').value.trim();
+            const roomTitle = document.getElementById('room-title').value.trim();
+
+            if (!hostName || !roomTitle) {
+                showToast('Please fill in all fields', 'error');
+                return;
+            }
+
+            const roomCode = generateRoomCode();
+            currentRoom = roomCode;
+            isHost = true;
+            currentUser = hostName;
+
+            // Create room data
+            rooms[roomCode] = {
+                title: roomTitle,
+                host: hostName,
+                participants: [{ name: hostName, isHost: true, score: 0 }],
+                questions: [],
+                status: 'waiting',
+                currentQuestion: 0
+            };
+
+            participants = rooms[roomCode].participants;
+            questions = rooms[roomCode].questions;
+
+            document.getElementById('display-room-code').textContent = roomCode;
+            updateParticipantsList();
+            showScreen('host-dashboard');
+            showToast('Room created successfully!');
+        }
+
+        function joinRoom() {
+            const participantName = document.getElementById('participant-name').value.trim();
+            const roomCode = document.getElementById('room-code-input').value.trim().toUpperCase();
+
+            if (!participantName || !roomCode) {
+                showToast('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (!rooms[roomCode]) {
+                showToast('Room not found', 'error');
+                return;
+            }
+
+            if (rooms[roomCode].status !== 'waiting') {
+                showToast('Quiz has already started', 'error');
+                return;
+            }
+
+            // Check if name already exists
+            if (rooms[roomCode].participants.some(p => p.name === participantName)) {
+                showToast('Name already taken in this room', 'error');
+                return;
+            }
+
+            currentRoom = roomCode;
+            isHost = false;
+            currentUser = participantName;
+
+            // Add participant
+            rooms[roomCode].participants.push({
+                name: participantName,
+                isHost: false,
+                score: 0
+            });
+
+            participants = rooms[roomCode].participants;
+            questions = rooms[roomCode].questions;
+
+            document.getElementById('participant-room-code').textContent = roomCode;
+            updateWaitingParticipantsList();
+            showScreen('participant-waiting');
+            showToast('Joined room successfully!');
+
+            // Simulate real-time update for host
+            setTimeout(() => {
+                if (rooms[roomCode] && isHost) {
+                    updateParticipantsList();
+                }
+            }, 100);
+        }
+
+        function leaveRoom() {
+            if (currentRoom && rooms[currentRoom]) {
+                // Remove participant
+                rooms[currentRoom].participants = rooms[currentRoom].participants.filter(
+                    p => p.name !== currentUser
+                );
+
+                // If host leaves, delete room
+                if (isHost) {
+                    delete rooms[currentRoom];
+                }
+            }
+
+            // Reset variables
+            currentRoom = null;
+            currentUser = null;
+            isHost = false;
+            questions = [];
+            participants = [];
+            currentQuestionIndex = 0;
+            userAnswers = [];
+
+            showScreen('welcome-screen');
+            showToast('Left room successfully');
+        }
+
+        // Question Management
+        function updateQuestionForm() {
+            const questionType = document.getElementById('question-type').value;
+            const optionsContainer = document.getElementById('options-container');
+
+            if (questionType === 'truefalse') {
+                optionsContainer.innerHTML = `
+                    <label>Select the correct answer:</label>
+                    <div class="option-input">
+                        <input type="radio" name="correct-option" value="0">
+                        <input type="text" value="True" id="option-0" readonly>
+                    </div>
+                    <div class="option-input">
+                        <input type="radio" name="correct-option" value="1">
+                        <input type="text" value="False" id="option-1" readonly>
+                    </div>
+                `;
+            } else {
+                optionsContainer.innerHTML = `
+                    <label>Options (select the correct answer):</label>
+                    <div class="option-input">
+                        <input type="radio" name="correct-option" value="0">
+                        <input type="text" placeholder="Option 1" id="option-0">
+                    </div>
+                    <div class="option-input">
+                        <input type="radio" name="correct-option" value="1">
+                        <input type="text" placeholder="Option 2" id="option-1">
+                    </div>
+                    <div class="option-input">
+                        <input type="radio" name="correct-option" value="2">
+                        <input type="text" placeholder="Option 3" id="option-2">
+                    </div>
+                    <div class="option-input">
+                        <input type="radio" name="correct-option" value="3">
+                        <input type="text" placeholder="Option 4" id="option-3">
+                    </div>
+                `;
+            }
+        }
+
+        function addQuestion() {
+            const questionText = document.getElementById('question-text').value.trim();
+            const questionType = document.getElementById('question-type').value;
+            const correctAnswer = document.querySelector('input[name="correct-option"]:checked');
+
+            if (!questionText) {
+                showToast('Please enter a question', 'error');
+                return;
+            }
+
+            if (!correctAnswer) {
+                showToast('Please select the correct answer', 'error');
+                return;
+            }
+
+            const options = [];
+            const numOptions = questionType === 'truefalse' ? 2 : 4;
+            
+            for (let i = 0; i < numOptions; i++) {
+                const optionText = document.getElementById(`option-${i}`).value.trim();
+                if (!optionText) {
+                    showToast(`Please fill in option ${i + 1}`, 'error');
+                    return;
+                }
+                options.push(optionText);
+            }
+
+            const question = {
+                id: questions.length + 1,
+                text: questionText,
+                type: questionType,
+                options: options,
+                correctAnswer: parseInt(correctAnswer.value)
+            };
+
+            questions.push(question);
+            rooms[currentRoom].questions = questions;
+
+            // Clear form
+            document.getElementById('question-text').value = '';
+            document.querySelectorAll('input[name="correct-option"]').forEach(radio => radio.checked = false);
+            if (questionType === 'multiple') {
+                for (let i = 0; i < 4; i++) {
+                    document.getElementById(`option-${i}`).value = '';
+                }
+            }
+
+            updateQuestionsList();
+            updateStartButton();
+            showToast('Question added successfully!');
+        }
+
+        function updateQuestionsList() {
+            const questionsList = document.getElementById('questions-list');
+            
+            if (questions.length === 0) {
+                questionsList.innerHTML = '<p>No questions added yet. Add your first question below!</p>';
+                return;
+            }
+
+            let html = '';
+            questions.forEach((question, index) => {
+                html += `
+                    <div class="question-item">
+                        <h4>Question ${index + 1}: ${question.text}</h4>
+                        <ul>
+                            ${question.options.map((option, optIndex) => 
+                                `<li class="${optIndex === question.correctAnswer ? 'correct' : ''}">${option} ${optIndex === question.correctAnswer ? '✓' : ''}</li>`
+                            ).join('')}
+                        </ul>
+                    </div>
+                `;
+            });
+
+            questionsList.innerHTML = html;
+        }
+
+        // Participant Management
+        function updateParticipantsList() {
+            const participantsList = document.getElementById('participants-list');
+            
+            if (participants.length === 0) {
+                participantsList.innerHTML = '<p>Waiting for participants to join...</p>';
+                return;
+            }
+
+            let html = '';
+            participants.forEach(participant => {
+                html += `
+                    <div class="participant">
+                        <span>${participant.name}</span>
+                        <span class="status ${participant.isHost ? 'host' : 'participant'}">
+                            ${participant.isHost ? 'Host' : 'Participant'}
+                        </span>
+                    </div>
+                `;
+            });
+
+            participantsList.innerHTML = html;
+            updateStartButton();
+        }
+
+        function updateWaitingParticipantsList() {
+            const participantsList = document.getElementById('waiting-participants-list');
+            
+            let html = '';
+            participants.forEach(participant => {
+                html += `
+                    <div class="participant">
+                        <span>${participant.name}</span>
+                        <span class="status ${participant.isHost ? 'host' : 'participant'}">
+                            ${participant.isHost ? 'Host' : 'Participant'}
+                        </span>
+                    </div>
+                `;
+            });
+
+            participantsList.innerHTML = html;
+        }
+
+        function updateStartButton() {
+            const startButton = document.getElementById('start-quiz-btn');
+            const canStart = questions.length > 0 && participants.length > 1;
+            startButton.disabled = !canStart;
+            
+            if (canStart) {
+                startButton.textContent = 'Start Quiz';
+            } else if (questions.length === 0) {
+                startButton.textContent = 'Add Questions First';
+            } else {
+                startButton.textContent = 'Waiting for Participants';
+            }
+        }
+
+        // Quiz Management
+        function startQuiz() {
+            if (questions.length === 0) {
+                showToast('Please add at least one question', 'error');
+                return;
+            }
+
+            if (participants.length < 2) {
+                showToast('Need at least 2 participants to start', 'error');
+                return;
+            }
+
+            rooms[currentRoom].status = 'active';
+            currentQuestionIndex = 0;
+            userAnswers = [];
+
+            // Initialize quiz for all participants
+            participants.forEach(p => p.score = 0);
+
+            loadQuestion();
+            showScreen('quiz-screen');
+            showToast('Quiz started!');
+
+            // Simulate other participants starting quiz
+            setTimeout(() => {
+                if (!isHost) {
+                    loadQuestion();
+                    showScreen('quiz-screen');
+                }
+            }, 1000);
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                endQuiz();
+                return;
+            }
+
+            const question = questions[currentQuestionIndex];
+            const totalQuestions = questions.length;
+            const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+
+            document.getElementById('current-question-num').textContent = currentQuestionIndex + 1;
+            document.getElementById('total-questions').textContent = totalQuestions;
+            document.getElementById('quiz-progress').style.width = progress + '%';
+            document.getElementById('question-display').textContent = question.text;
+
+            const optionsContainer = document.getElementById('quiz-options');
+            let html = '';
+            
+            question.options.forEach((option, index) => {
+                html += `
+                    <div class="quiz-option" onclick="selectOption(${index})">
+                        ${option}
+                    </div>
+                `;
+            });
+
+            optionsContainer.innerHTML = html;
+            document.getElementById('next-question-btn').disabled = true;
+        }
+
+        function selectOption(optionIndex) {
+            // Remove previous selection
+            document.querySelectorAll('.quiz-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+
+            // Select current option
+            document.querySelectorAll('.quiz-option')[optionIndex].classList.add('selected');
+            
+            // Store answer
+            userAnswers[currentQuestionIndex] = optionIndex;
+            
+            // Enable next button
+            document.getElementById('next-question-btn').disabled = false;
+        }
+
+        function nextQuestion() {
+            if (userAnswers[currentQuestionIndex] === undefined) {
+                showToast('Please select an answer', 'error');
+                return;
+            }
+
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex >= questions.length) {
+                endQuiz();
+            } else {
+                loadQuestion();
+            }
+        }
+
+        function endQuiz() {
+            // Calculate score
+            let score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === questions[index].correctAnswer) {
+                    score++;
+                }
+            });
+
+            // Update participant score
+            const participant = participants.find(p => p.name === currentUser);
+            if (participant) {
+                participant.score = score;
+            }
+
+            rooms[currentRoom].status = 'completed';
+
+            // Show results
+            showResults();
+        }
+
+        function showResults() {
+            const resultsContainer = document.getElementById('results-container');
+            
+            // Sort participants by score
+            const sortedParticipants = [...participants].sort((a, b) => b.score - a.score);
+            
+            let html = '';
+            sortedParticipants.forEach((participant, index) => {
+                const percentage = Math.round((participant.score / questions.length) * 100);
+                html += `
+                    <div class="result-item">
+                        <div>
+                            <strong>${participant.name}</strong>
+                            ${participant.isHost ? '<span class="status host">Host</span>' : ''}
+                            ${index === 0 ? ' 🏆' : ''}
+                        </div>
+                        <div class="score">${participant.score}/${questions.length} (${percentage}%)</div>
+                    </div>
+                `;
+            });
+
+            resultsContainer.innerHTML = html;
+            showScreen('results-screen');
+            showToast('Quiz completed!');
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add enter key support for inputs
+            document.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const activeScreen = document.querySelector('.screen.active');
+                    const activeButton = activeScreen.querySelector('.btn:not([disabled])');
+                    if (activeButton) {
+                        activeButton.click();
+                    }
+                }
+            });
+
+            // Auto-uppercase room code input
+            document.getElementById('room-code-input').addEventListener('input', function(e) {
+                e.target.value = e.target.value.toUpperCase();
+            });
+
+            console.log('QuizMaster initialized successfully!');
+        });
+    </script>
+</body>
+</html>
